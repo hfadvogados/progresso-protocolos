@@ -19,7 +19,8 @@
     background:
       radial-gradient(1200px 800px at 20% -10%, #1f2937 0%, transparent 60%),
       radial-gradient(1400px 1000px at 120% 120%, #1f2937 0%, transparent 60%), var(--bg);
-    display:flex; align-items:center; justify-content:center; padding:24px;
+    display:flex; align-items:center; justify-content:center;
+    padding: max(24px, env(safe-area-inset-top, 0px) + 16px) 24px 24px;
   }
   .wrap{ width:min(980px,100%); display:grid; gap:20px }
   .card{ background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:20px 22px; box-shadow:var(--shadow); backdrop-filter:blur(8px) }
@@ -65,15 +66,16 @@
   .foot{ display:flex; gap:10px; flex-wrap:wrap; color:var(--muted); font-size:.92rem }
   .pill{ border:1px solid var(--border); padding:6px 10px; border-radius:999px; background:#0b1220 }
 
-  /* Estado de carregando/erro */
   .muted{ color:var(--muted) }
   .warn{ color:#fca5a5 }
 
-  /* Correções para celular */
+  /* chips adicionais para mobile */
+  .miniBadges{ display:none; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
+  .miniBadges .chip{ padding:6px 10px; font-size:.95rem }
+
   @media (max-width:540px){
-    .header{ flex-direction:column; align-items:stretch; gap:12px }
-    .badgeRow{ width:100%; display:flex; flex-wrap:wrap; justify-content:flex-start; gap:8px 10px }
-    .chip{ padding:6px 10px; font-size:.9rem }
+    .header .badgeRow{ display:none }
+    .miniBadges{ display:flex }
     .actions{ width:100% }
     .btn{ width:100% }
   }
@@ -90,20 +92,24 @@
         <button class="btn" id="btnRefresh" aria-label="Atualizar agora">Atualizar agora</button>
       </div>
       <div class="badgeRow" aria-label="Resumo">
-        <div class="chip ok"   aria-label="Concluídos"><span class="dot"></span><span>Concluídos:</span><strong id="bDone">0</strong></div>
-        <div class="chip fail" aria-label="Falhados"><span class="dot"></span><span>Falhados:</span><strong id="bFail">0</strong></div>
-        <div class="chip meta" aria-label="Meta"><span class="dot"></span><span>Meta:</span><strong id="bTotal">2 589</strong></div>
+        <div class="chip ok"><span class="dot"></span><span>Concluídos:</span><strong id="bDone">0</strong></div>
+        <div class="chip fail"><span class="dot"></span><span>Falhados:</span><strong id="bFail">0</strong></div>
+        <div class="chip meta"><span class="dot"></span><span>Meta:</span><strong id="bTotal">2 589</strong></div>
       </div>
     </div>
 
     <div class="card main">
+      <div class="miniBadges" aria-label="Resumo (mobile)">
+        <div class="chip ok"><span class="dot"></span><span>Concluídos:</span><strong id="bDone2">0</strong></div>
+        <div class="chip fail"><span class="dot"></span><span>Falhados:</span><strong id="bFail2">0</strong></div>
+        <div class="chip meta"><span class="dot"></span><span>Meta:</span><strong id="bTotal2">2 589</strong></div>
+      </div>
       <div class="gauge" id="gauge" aria-label="Progresso total">
         <div class="center">
           <div class="pct" id="pct">0,0%</div>
           <div class="cnt" id="cnt">0 de 0</div>
         </div>
       </div>
-
       <div class="right">
         <div class="kpi"><span>Percentual concluído</span><strong id="kpiPct">0,0%</strong></div>
         <div class="kpi"><span>Restantes</span><strong id="kpiLeft">0</strong></div>
@@ -120,132 +126,91 @@
   </div>
 
 <script>
-  // ===== Config =====
   const FALLBACK_TOTAL = 2589;
   const DATA_URL = "status.json";
   const POLL_MS = 60000;
   const FETCH_TIMEOUT_MS = 10000;
   const LS_KEY = "protocolos:lastOk";
 
-  // ===== Atalhos DOM =====
   const el = {
-    gauge:  document.getElementById("gauge"),
-    pct:    document.getElementById("pct"),
-    cnt:    document.getElementById("cnt"),
-    bDone:  document.getElementById("bDone"),
-    bFail:  document.getElementById("bFail"),
-    bTotal: document.getElementById("bTotal"),
-    kpiPct: document.getElementById("kpiPct"),
-    kpiLeft:document.getElementById("kpiLeft"),
-    kpiUpd: document.getElementById("kpiUpd"),
-    fill:   document.getElementById("fill"),
-    status: document.getElementById("statusMsg"),
-    footCache: document.getElementById("footCache"),
-    btnRefresh: document.getElementById("btnRefresh"),
+    gauge:document.getElementById("gauge"), pct:document.getElementById("pct"),
+    cnt:document.getElementById("cnt"), bDone:document.getElementById("bDone"),
+    bFail:document.getElementById("bFail"), bTotal:document.getElementById("bTotal"),
+    kpiPct:document.getElementById("kpiPct"), kpiLeft:document.getElementById("kpiLeft"),
+    kpiUpd:document.getElementById("kpiUpd"), fill:document.getElementById("fill"),
+    status:document.getElementById("statusMsg"), footCache:document.getElementById("footCache"),
+    btnRefresh:document.getElementById("btnRefresh"),
   };
 
-  // ===== Utils =====
   const br = (n)=> Number(n||0).toLocaleString('pt-BR');
-  const pctText = (p)=> (p*100).toFixed(1).replace('.',',') + "%";
-  const clamp01 = (x)=> Math.max(0, Math.min(1, x));
+  const pctText = (p)=> (p*100).toFixed(1).replace('.',',')+"%";
+  const clamp01 = (x)=> Math.max(0,Math.min(1,x));
 
   function render({done=0,total=FALLBACK_TOTAL,failed=null,updated_at=null}){
-    total = Number(total)||FALLBACK_TOTAL;
-    done  = Number(done)||0;
-    const pct = clamp01(done/total);
-    const left = Math.max(0, total - done);
+    total = Number(total)||FALLBACK_TOTAL; done=Number(done)||0;
+    const pct = clamp01(done/total); const left = Math.max(0,total-done);
 
-    el.gauge.style.setProperty("--angle", (pct*360) + "deg");
-    el.pct.textContent = pctText(pct);
-    el.cnt.textContent = `${br(done)} de ${br(total)}`;
-    el.kpiPct.textContent = pctText(pct);
-    el.kpiLeft.textContent = br(left);
-    el.bDone.textContent = br(done);
-    el.bTotal.textContent = br(total);
-    if (failed != null) el.bFail.textContent = br(failed);
-    el.fill.style.width = (pct*100) + "%";
+    el.gauge.style.setProperty("--angle",(pct*360)+"deg");
+    el.pct.textContent=pctText(pct); el.cnt.textContent=`${br(done)} de ${br(total)}`;
+    el.kpiPct.textContent=pctText(pct); el.kpiLeft.textContent=br(left);
+    el.bDone.textContent=br(done); el.bTotal.textContent=br(total);
+    if(failed!=null) el.bFail.textContent=br(failed);
+    el.fill.style.width=(pct*100)+"%";
 
-    let dt;
-    try{
-      dt = updated_at ? new Date(updated_at) : new Date();
-      el.kpiUpd.textContent = dt.toLocaleString('pt-BR');
-    }catch{
-      el.kpiUpd.textContent = "—";
-    }
+    // espelha nos chips mobile
+    const bd2=document.getElementById("bDone2"),
+          bf2=document.getElementById("bFail2"),
+          bt2=document.getElementById("bTotal2");
+    if(bd2) bd2.textContent=br(done);
+    if(bt2) bt2.textContent=br(total);
+    if(bf2 && failed!=null) bf2.textContent=br(failed);
+
+    try{ const d=updated_at?new Date(updated_at):new Date();
+      el.kpiUpd.textContent=d.toLocaleString('pt-BR');
+    }catch{ el.kpiUpd.textContent="—"; }
   }
 
-  function setStatus(msg, isError=false){
-    el.status.textContent = msg || "";
-    el.status.className = isError ? "warn" : "muted";
+  function setStatus(msg,isError=false){
+    el.status.textContent=msg||""; el.status.className=isError?"warn":"muted";
   }
 
   function saveLastOk(payload){
-    try{
-      localStorage.setItem(LS_KEY, JSON.stringify({payload, ts: Date.now()}));
-      el.footCache.textContent = "";
-    }catch{}
+    try{ localStorage.setItem(LS_KEY,JSON.stringify({payload,ts:Date.now()}));
+      el.footCache.textContent=""; }catch{}
   }
   function loadLastOk(){
-    try{
-      const raw = localStorage.getItem(LS_KEY);
-      if(!raw) return null;
-      const {payload, ts} = JSON.parse(raw);
-      if(!payload) return null;
-      const when = new Date(ts).toLocaleString('pt-BR');
-      el.footCache.textContent = `Último sucesso salvo: ${when}`;
+    try{ const raw=localStorage.getItem(LS_KEY); if(!raw) return null;
+      const {payload,ts}=JSON.parse(raw); if(!payload) return null;
+      el.footCache.textContent=`Último sucesso salvo: ${new Date(ts).toLocaleString('pt-BR')}`;
       return payload;
     }catch{ return null; }
   }
 
-  async function fetchWithTimeout(url, opts={}, timeoutMs=FETCH_TIMEOUT_MS){
-    const ctrl = new AbortController();
-    const id = setTimeout(()=>ctrl.abort(), timeoutMs);
-    try{
-      const res = await fetch(url, {...opts, signal: ctrl.signal});
-      clearTimeout(id);
-      return res;
-    }catch(e){
-      clearTimeout(id);
-      throw e;
-    }
+  async function fetchWithTimeout(url,opts={},timeoutMs=FETCH_TIMEOUT_MS){
+    const ctrl=new AbortController(); const id=setTimeout(()=>ctrl.abort(),timeoutMs);
+    try{ const res=await fetch(url,{...opts,signal:ctrl.signal}); clearTimeout(id); return res; }
+    catch(e){ clearTimeout(id); throw e; }
   }
 
   async function loadData(){
     setStatus("atualizando…");
     try{
-      const res = await fetchWithTimeout(`${DATA_URL}?ts=${Date.now()}`, {cache:"no-store"});
+      const res=await fetchWithTimeout(`${DATA_URL}?ts=${Date.now()}`,{cache:"no-store"});
       if(!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
-
-      // sane defaults
-      if (json && (json.done==null || json.total==null)) {
-        json.total ??= FALLBACK_TOTAL;
-        json.done  ??= 0;
-      }
-      if (!json.updated_at) json.updated_at = new Date().toISOString();
-
-      render(json);
-      saveLastOk(json);
-      setStatus("atualizado");
+      const json=await res.json();
+      if(json && (json.done==null||json.total==null)){ json.total??=FALLBACK_TOTAL; json.done??=0; }
+      if(!json.updated_at) json.updated_at=new Date().toISOString();
+      render(json); saveLastOk(json); setStatus("atualizado");
     }catch(err){
-      console.error(err);
-      const cached = loadLastOk();
-      if(cached){
-        render(cached);
-        setStatus("sem conexão — mostrando último dado salvo", true);
-      }else{
-        render({}); // fallback visual
-        setStatus("erro ao atualizar", true);
-      }
+      console.error(err); const cached=loadLastOk();
+      if(cached){ render(cached); setStatus("sem conexão — mostrando último dado salvo",true); }
+      else{ render({}); setStatus("erro ao atualizar",true); }
     }
   }
 
-  // ==== Init/Poll ====
-  el.btnRefresh.addEventListener("click", loadData);
-  const cached = loadLastOk();
-  if(cached){ render(cached); setStatus("carregado do cache"); }
-  loadData();
-  setInterval(loadData, POLL_MS);
+  el.btnRefresh.addEventListener("click",loadData);
+  const cached=loadLastOk(); if(cached){ render(cached); setStatus("carregado do cache"); }
+  loadData(); setInterval(loadData,POLL_MS);
 </script>
 </body>
 </html>
