@@ -8,105 +8,88 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg: #0f172a;
-    --panel: #111827cc;
-    --muted: #9aa3b2;
-    --text: #e5e7eb;
-    --ring: #22c55e;
-    --track:#1f2937;
-    --accent:#38bdf8;
-    --danger:#ef4444;
-    --border:#2a3648;
-    --shadow: 0 10px 30px rgba(0,0,0,.35);
+    --bg:#0f172a; --panel:#111827cc; --muted:#9aa3b2; --text:#e5e7eb; --ring:#22c55e;
+    --track:#1f2937; --accent:#38bdf8; --danger:#ef4444; --border:#2a3648;
+    --shadow:0 10px 30px rgba(0,0,0,.35);
   }
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
-    margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,sans-serif;
-    color:var(--text);
+    margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,sans-serif; color:var(--text);
     background:
       radial-gradient(1200px 800px at 20% -10%, #1f2937 0%, transparent 60%),
-      radial-gradient(1400px 1000px at 120% 120%, #1f2937 0%, transparent 60%),
-      var(--bg);
+      radial-gradient(1400px 1000px at 120% 120%, #1f2937 0%, transparent 60%), var(--bg);
     display:flex; align-items:center; justify-content:center; padding:24px;
   }
-  .wrap{ width:min(980px,100%); display:grid; gap:20px; }
-  .card{
-    background:var(--panel); border:1px solid var(--border);
-    border-radius:16px; padding:20px 22px; box-shadow:var(--shadow); backdrop-filter: blur(8px);
-  }
+  .wrap{ width:min(980px,100%); display:grid; gap:20px }
+  .card{ background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:20px 22px; box-shadow:var(--shadow); backdrop-filter:blur(8px) }
+
   .header{ display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap }
-  .title{ font-weight:700; letter-spacing:.2px }
-  .badgeRow{ display:flex; gap:10px; flex-wrap:wrap }
-  .chip{
-    display:flex; gap:8px; align-items:center; padding:8px 12px; border-radius:999px;
-    background:#0b1220; border:1px solid var(--border); color: var(--muted);
+  .title{ font-weight:700; letter-spacing:.2px; display:flex; align-items:center; gap:10px }
+  .actions{ display:flex; gap:8px; flex-wrap:wrap }
+  .btn{
+    appearance:none; border:1px solid var(--border); background:#0b1220; color:var(--text);
+    padding:8px 12px; border-radius:10px; font-weight:600; cursor:pointer;
   }
+  .btn:active{ transform:translateY(1px) }
+  .badgeRow{ display:flex; gap:10px; flex-wrap:wrap }
+  .chip{ display:flex; gap:8px; align-items:center; padding:8px 12px; border-radius:999px; background:#0b1220; border:1px solid var(--border); color:var(--muted) }
   .chip strong{ color:var(--text) }
   .dot{ width:8px; height:8px; border-radius:50% }
-  .ok .dot{ background:var(--ring) }
-  .fail .dot{ background:var(--danger) }
-  .meta .dot{ background:var(--accent) }
+  .ok .dot{ background:var(--ring) } .fail .dot{ background:var(--danger) } .meta .dot{ background:var(--accent) }
 
-  .main{ display:grid; grid-template-columns: 360px 1fr; gap:20px; align-items:center }
-  @media (max-width: 880px){ .main{ grid-template-columns:1fr } }
+  .main{ display:grid; grid-template-columns:360px 1fr; gap:20px; align-items:center }
+  @media (max-width:880px){ .main{ grid-template-columns:1fr } }
 
   .gauge{
-    --angle: 0deg;
-    width:320px; height:320px; border-radius:50%;
-    background:
-      conic-gradient(var(--ring) var(--angle), var(--track) var(--angle));
-    display:flex; align-items:center; justify-content:center; position:relative;
-    box-shadow: var(--shadow);
-    transition: background 800ms cubic-bezier(.2,.8,.2,1);
+    --angle:0deg; width:320px; height:320px; border-radius:50%;
+    background:conic-gradient(var(--ring) var(--angle), var(--track) var(--angle));
+    display:flex; align-items:center; justify-content:center; position:relative; box-shadow:var(--shadow);
+    transition:background 800ms cubic-bezier(.2,.8,.2,1);
   }
   .gauge::before{
-    content:""; position:absolute; width:240px; height:240px; border-radius:50%;
-    background:#0b1220; border:1px solid var(--border); box-shadow: inset 0 0 0 1px #0f172a;
+    content:""; position:absolute; width:240px; height:240px; border-radius:50%; background:#0b1220; border:1px solid var(--border); box-shadow:inset 0 0 0 1px #0f172a;
   }
   .center{ position:absolute; text-align:center }
   .pct{ font-size:2.8rem; font-weight:700 }
   .cnt{ margin-top:.25rem; color:var(--muted) }
 
   .right{ display:grid; gap:12px }
-  .kpi{
-    display:flex; align-items:center; justify-content:space-between;
-    background:#0b1220; border:1px solid var(--border); border-radius:12px; padding:14px 16px;
-  }
+  .kpi{ display:flex; align-items:center; justify-content:space-between; background:#0b1220; border:1px solid var(--border); border-radius:12px; padding:14px 16px }
   .kpi span{ color:var(--muted) }
   .kpi strong{ font-size:1.05rem }
 
   .linear{ height:10px; border-radius:999px; background:#0b1220; border:1px solid var(--border); overflow:hidden }
-  .fill{ height:100%; width:0%; background: linear-gradient(90deg, var(--ring), #4ade80 60%, var(--ring)); transition: width 800ms }
+  .fill{ height:100%; width:0%; background:linear-gradient(90deg, var(--ring), #4ade80 60%, var(--ring)); transition:width 800ms }
 
   .foot{ display:flex; gap:10px; flex-wrap:wrap; color:var(--muted); font-size:.92rem }
   .pill{ border:1px solid var(--border); padding:6px 10px; border-radius:999px; background:#0b1220 }
-/* Correções para celular */
-@media (max-width: 540px){
-  .header{
-    flex-direction: column;          /* empilha título e chips */
-    align-items: stretch;
-    gap: 12px;
+
+  /* Estado de carregando/erro */
+  .muted{ color:var(--muted) }
+  .warn{ color:#fca5a5 }
+
+  /* Correções para celular */
+  @media (max-width:540px){
+    .header{ flex-direction:column; align-items:stretch; gap:12px }
+    .badgeRow{ width:100%; display:flex; flex-wrap:wrap; justify-content:flex-start; gap:8px 10px }
+    .chip{ padding:6px 10px; font-size:.9rem }
+    .actions{ width:100% }
+    .btn{ width:100% }
   }
-  .badgeRow{
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;                 /* permite quebrar linha */
-    justify-content: flex-start;     /* alinha à esquerda */
-    gap: 8px 10px;                   /* espaçamento entre chips */
-  }
-  .chip{
-    padding: 6px 10px;
-    font-size: .9rem;                /* levemente menor p/ caber */
-  }
-}
 </style>
 </head>
 <body>
   <div class="wrap">
     <div class="card header" role="banner">
-      <div class="title">Progresso de Protocolos</div>
-      <div class="badgeRow">
+      <div class="title">
+        Progresso de Protocolos
+        <span id="statusMsg" class="muted" aria-live="polite"></span>
+      </div>
+      <div class="actions">
+        <button class="btn" id="btnRefresh" aria-label="Atualizar agora">Atualizar agora</button>
+      </div>
+      <div class="badgeRow" aria-label="Resumo">
         <div class="chip ok"   aria-label="Concluídos"><span class="dot"></span><span>Concluídos:</span><strong id="bDone">0</strong></div>
         <div class="chip fail" aria-label="Falhados"><span class="dot"></span><span>Falhados:</span><strong id="bFail">0</strong></div>
         <div class="chip meta" aria-label="Meta"><span class="dot"></span><span>Meta:</span><strong id="bTotal">2 589</strong></div>
@@ -115,7 +98,7 @@
 
     <div class="card main">
       <div class="gauge" id="gauge" aria-label="Progresso total">
-        <div class="center" aria-live="polite">
+        <div class="center">
           <div class="pct" id="pct">0,0%</div>
           <div class="cnt" id="cnt">0 de 0</div>
         </div>
@@ -132,67 +115,137 @@
     <div class="foot">
       <span class="pill">Atualiza automaticamente a cada 60s</span>
       <span>Fonte de dados: <code>status.json</code></span>
+      <span id="footCache" class="muted"></span>
     </div>
   </div>
 
 <script>
+  // ===== Config =====
   const FALLBACK_TOTAL = 2589;
   const DATA_URL = "status.json";
+  const POLL_MS = 60000;
+  const FETCH_TIMEOUT_MS = 10000;
+  const LS_KEY = "protocolos:lastOk";
 
+  // ===== Atalhos DOM =====
   const el = {
-    gauge: document.getElementById("gauge"),
-    pct:   document.getElementById("pct"),
-    cnt:   document.getElementById("cnt"),
-    bDone: document.getElementById("bDone"),
-    bFail: document.getElementById("bFail"),
-    bTotal:document.getElementById("bTotal"),
-    kpiPct:document.getElementById("kpiPct"),
+    gauge:  document.getElementById("gauge"),
+    pct:    document.getElementById("pct"),
+    cnt:    document.getElementById("cnt"),
+    bDone:  document.getElementById("bDone"),
+    bFail:  document.getElementById("bFail"),
+    bTotal: document.getElementById("bTotal"),
+    kpiPct: document.getElementById("kpiPct"),
     kpiLeft:document.getElementById("kpiLeft"),
-    kpiUpd:document.getElementById("kpiUpd"),
-    fill:  document.getElementById("fill"),
+    kpiUpd: document.getElementById("kpiUpd"),
+    fill:   document.getElementById("fill"),
+    status: document.getElementById("statusMsg"),
+    footCache: document.getElementById("footCache"),
+    btnRefresh: document.getElementById("btnRefresh"),
   };
 
-  function br(n){ return Number(n||0).toLocaleString('pt-BR'); }
-  function pctText(p){ return (p*100).toFixed(1).replace('.',',') + "%"; }
+  // ===== Utils =====
+  const br = (n)=> Number(n||0).toLocaleString('pt-BR');
+  const pctText = (p)=> (p*100).toFixed(1).replace('.',',') + "%";
+  const clamp01 = (x)=> Math.max(0, Math.min(1, x));
 
   function render({done=0,total=FALLBACK_TOTAL,failed=null,updated_at=null}){
     total = Number(total)||FALLBACK_TOTAL;
     done  = Number(done)||0;
-    const pct = Math.max(0, Math.min(1, done/total));
+    const pct = clamp01(done/total);
     const left = Math.max(0, total - done);
 
     el.gauge.style.setProperty("--angle", (pct*360) + "deg");
-    el.pct.textContent   = pctText(pct);
-    el.cnt.textContent   = `${br(done)} de ${br(total)}`;
-    el.kpiPct.textContent= pctText(pct);
+    el.pct.textContent = pctText(pct);
+    el.cnt.textContent = `${br(done)} de ${br(total)}`;
+    el.kpiPct.textContent = pctText(pct);
     el.kpiLeft.textContent = br(left);
     el.bDone.textContent = br(done);
-    el.bTotal.textContent= br(total);
-    if (failed!=null) el.bFail.textContent = br(failed);
-
+    el.bTotal.textContent = br(total);
+    if (failed != null) el.bFail.textContent = br(failed);
     el.fill.style.width = (pct*100) + "%";
 
+    let dt;
     try{
-      const d = updated_at ? new Date(updated_at) : null;
-      el.kpiUpd.textContent = d ? d.toLocaleString('pt-BR') : "—";
+      dt = updated_at ? new Date(updated_at) : new Date();
+      el.kpiUpd.textContent = dt.toLocaleString('pt-BR');
     }catch{
       el.kpiUpd.textContent = "—";
     }
   }
 
-  async function fetchData(){
+  function setStatus(msg, isError=false){
+    el.status.textContent = msg || "";
+    el.status.className = isError ? "warn" : "muted";
+  }
+
+  function saveLastOk(payload){
     try{
-      const res = await fetch(`${DATA_URL}?ts=${Date.now()}`, {cache:"no-store"});
-      const json = await res.json();
-      render(json);
+      localStorage.setItem(LS_KEY, JSON.stringify({payload, ts: Date.now()}));
+      el.footCache.textContent = "";
+    }catch{}
+  }
+  function loadLastOk(){
+    try{
+      const raw = localStorage.getItem(LS_KEY);
+      if(!raw) return null;
+      const {payload, ts} = JSON.parse(raw);
+      if(!payload) return null;
+      const when = new Date(ts).toLocaleString('pt-BR');
+      el.footCache.textContent = `Último sucesso salvo: ${when}`;
+      return payload;
+    }catch{ return null; }
+  }
+
+  async function fetchWithTimeout(url, opts={}, timeoutMs=FETCH_TIMEOUT_MS){
+    const ctrl = new AbortController();
+    const id = setTimeout(()=>ctrl.abort(), timeoutMs);
+    try{
+      const res = await fetch(url, {...opts, signal: ctrl.signal});
+      clearTimeout(id);
+      return res;
     }catch(e){
-      console.error(e);
-      render({});
+      clearTimeout(id);
+      throw e;
     }
   }
 
-  fetchData();
-  setInterval(fetchData, 60000);
+  async function loadData(){
+    setStatus("atualizando…");
+    try{
+      const res = await fetchWithTimeout(`${DATA_URL}?ts=${Date.now()}`, {cache:"no-store"});
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+
+      // sane defaults
+      if (json && (json.done==null || json.total==null)) {
+        json.total ??= FALLBACK_TOTAL;
+        json.done  ??= 0;
+      }
+      if (!json.updated_at) json.updated_at = new Date().toISOString();
+
+      render(json);
+      saveLastOk(json);
+      setStatus("atualizado");
+    }catch(err){
+      console.error(err);
+      const cached = loadLastOk();
+      if(cached){
+        render(cached);
+        setStatus("sem conexão — mostrando último dado salvo", true);
+      }else{
+        render({}); // fallback visual
+        setStatus("erro ao atualizar", true);
+      }
+    }
+  }
+
+  // ==== Init/Poll ====
+  el.btnRefresh.addEventListener("click", loadData);
+  const cached = loadLastOk();
+  if(cached){ render(cached); setStatus("carregado do cache"); }
+  loadData();
+  setInterval(loadData, POLL_MS);
 </script>
 </body>
 </html>
