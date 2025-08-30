@@ -1,68 +1,189 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Progresso de Protocolos</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Progresso de Protocolos • Copacabana</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700&display=swap" rel="stylesheet">
 <style>
-  :root { --green:#4caf50; --gray:#e0e0e0; }
-  * { box-sizing: border-box; }
-  body { margin:0; font-family: Arial, Helvetica, sans-serif; background:#f5f5f5; color:#333;
-         min-height:100vh; display:flex; align-items:center; justify-content:center; }
-  .wrap { text-align:center; padding:24px; }
-  .ring { position:relative; width:240px; height:240px; margin:0 auto 16px;
-          border-radius:50%; background:conic-gradient(var(--green) var(--angle,0deg), var(--gray) var(--angle,0deg));
-          display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,.08); }
-  .ring::before { content:""; position:absolute; width:180px; height:180px; border-radius:50%; background:#fff; }
-  .center { position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; }
-  .pct { font-size:2rem; font-weight:700; }
-  .cnt { margin-top:.25rem; font-size:1rem; color:#444; }
-  .note { margin-top:.75rem; font-size:.95rem; color:#666; }
+  :root{
+    --green:#16a34a;     /* verde “esperança” */
+    --dark:#111827;      /* cinza-escuro para texto */
+    --muted:#6b7280;     /* cinza de apoio */
+    --card:#ffffff;
+    --bg:#f8fafc;        /* areia clara */
+    --accent:#0ea5e9;    /* azul “mar” */
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,sans-serif;
+    color:var(--dark);
+    background:
+      radial-gradient(1200px 600px at 50% -10%, rgba(255,193,7,.10), transparent 70%),
+      var(--bg);
+    display:flex; align-items:center; justify-content:center; padding:24px;
+  }
+
+  /* Padrão Copacabana (ondas P&B) bem suave no fundo */
+  .copacabana{
+    position:fixed; inset:0; pointer-events:none; opacity:.07;
+    background:
+      repeating-linear-gradient(90deg, #000 0 16px, #fff 16px 32px),
+      repeating-radial-gradient(circle at 0 16px, transparent 0 14px, rgba(0,0,0,.08) 14px 16px);
+    mix-blend-mode:multiply;
+  }
+
+  .wrap{
+    position:relative; z-index:1;
+    width:min(860px,100%); display:grid; gap:20px;
+    grid-template-columns: 1fr;
+  }
+
+  .card{
+    background:var(--card);
+    border-radius:16px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+    padding:24px;
+  }
+
+  /* Header */
+  .header{display:flex; gap:16px; align-items:center; justify-content:space-between; flex-wrap:wrap}
+  .title{font-weight:700; font-size:1.1rem;}
+  .badges{display:flex; gap:10px; flex-wrap:wrap}
+  .chip{
+    background:#f1f5f9; color:#0f172a; border-radius:999px; padding:8px 12px; font-size:.92rem;
+    display:flex; align-items:center; gap:8px; border:1px solid #e2e8f0;
+  }
+  .chip .dot{width:8px;height:8px;border-radius:50%}
+  .chip.ok   .dot{background:var(--green)}
+  .chip.fail .dot{background:#ef4444}
+  .chip.meta .dot{background:var(--accent)}
+
+  /* Gauge */
+  .gauge{
+    display:grid; grid-template-columns: 320px 1fr; gap:24px; align-items:center;
+  }
+  @media (max-width:780px){ .gauge{grid-template-columns:1fr; text-align:center} }
+
+  .ring{
+    --angle:0deg;
+    width:280px; height:280px; border-radius:50%;
+    background:
+      conic-gradient(var(--green) var(--angle), #e5e7eb var(--angle));
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+    transition: background 900ms cubic-bezier(.2,.8,.2,1);
+  }
+  .ring::before{
+    content:""; position:absolute; width:210px; height:210px; border-radius:50%;
+    background:#fff; box-shadow:inset 0 0 0 1px #eef2f7;
+  }
+  .center{position:absolute; text-align:center}
+  .pct{font-size:2.4rem; font-weight:700;}
+  .cnt{margin-top:.25rem; color:var(--muted)}
+
+  .meta{ display:grid; gap:10px; }
+  .kpi{
+    padding:14px 16px; border:1px solid #e2e8f0; border-radius:12px; background:#fff;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .kpi span:first-child{color:#334155}
+  .kpi strong{font-weight:700}
+
+  .foot{margin-top:10px; color:var(--muted); font-size:.92rem; display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+  .pill{
+    border:1px solid #e2e8f0; padding:6px 10px; border-radius:999px; background:#fff; color:#334155;
+  }
+
+  /* “Sol” sutil */
+  .sun{
+    position:absolute; top:-24px; left: -24px;
+    width:96px; height:96px; border-radius:50%;
+    background:radial-gradient(circle at 30% 30%, #fde68a, #f59e0b 60%, transparent 70%);
+    filter:blur(2px); opacity:.9; pointer-events:none;
+  }
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="ring" id="ring" style="--angle:0deg">
+<div class="copacabana"></div>
+
+<div class="wrap">
+  <div class="card header">
+    <div class="title">Progresso de Protocolos • Rio</div>
+    <div class="badges">
+      <div class="chip ok"><span class="dot"></span><span>Concluídos:</span><strong id="bDone">0</strong></div>
+      <div class="chip fail"><span class="dot"></span><span>Falhados:</span><strong id="bFail">0</strong></div>
+      <div class="chip meta"><span class="dot"></span><span>Meta:</span><strong id="bTotal">2 589</strong></div>
+    </div>
+  </div>
+
+  <div class="card gauge">
+    <div class="ring" id="ring"><div class="sun"></div>
       <div class="center">
         <div class="pct" id="pct">0,0%</div>
         <div class="cnt" id="cnt">0 de 0</div>
       </div>
     </div>
-    <div class="note" id="meta">Progresso de protocolos concluídos</div>
-    <div class="note" id="upd"></div>
+    <div class="meta">
+      <div class="kpi"><span>Percentual concluído</span><strong id="kpiPct">0,0%</strong></div>
+      <div class="kpi"><span>Restantes</span><strong id="kpiLeft">0</strong></div>
+      <div class="kpi"><span>Última atualização</span><strong id="kpiUpd">—</strong></div>
+    </div>
   </div>
 
-<script>      
-const FALLBACK_TOTAL = 2589; // total padrão se o JSON não trouxer
-const DATA_URL = "status.json"; // mesmo repositório (raiz)
+  <div class="foot">
+    <span class="pill">Calçadão de Copacabana • estilo visual</span>
+    <span>Atualiza automaticamente a cada 60s</span>
+  </div>
+</div>
 
-function formatPct(p){ return (p*100).toFixed(1).replace('.',',') + "%"; }
+<script>
+const FALLBACK_TOTAL = 2589;           // se o JSON não trouxer total
+const DATA_URL = "status.json";        // mesmo repositório
 
-function render(done, total, updatedAt){
-  total = Number.isFinite(total) && total > 0 ? total : FALLBACK_TOTAL;
-  done  = Math.max(0, Number(done) || 0);
-  const pct = Math.min(1, done/total);
-  document.getElementById("ring").style.setProperty("--angle", (pct*360) + "deg");
-  document.getElementById("pct").textContent = formatPct(pct);
-  document.getElementById("cnt").textContent = `${done.toLocaleString('pt-BR')} de ${total.toLocaleString('pt-BR')}`;
-  document.getElementById("upd").textContent = updatedAt
-    ? `Atualizado: ${new Date(updatedAt).toLocaleString('pt-BR')}`
-    : "";
+function brNum(n){ return Number(n||0).toLocaleString('pt-BR'); }
+function pctText(p){ return (p*100).toFixed(1).replace('.',',') + "%"; }
+
+function render({done=0,total=FALLBACK_TOTAL,failed=null,updated_at=null}){
+  total = Number(total)||FALLBACK_TOTAL; done = Number(done)||0;
+  const pct = Math.max(0, Math.min(1, done/total));
+  const left = Math.max(0, total - done);
+  // ring
+  document.getElementById("ring").style.setProperty("--angle", (pct*360)+"deg");
+  document.getElementById("pct").textContent = pctText(pct);
+  document.getElementById("cnt").textContent = `${brNum(done)} de ${brNum(total)}`;
+  // KPIs
+  document.getElementById("kpiPct").textContent  = pctText(pct);
+  document.getElementById("kpiLeft").textContent = brNum(left);
+  document.getElementById("bDone").textContent   = brNum(done);
+  document.getElementById("bTotal").textContent  = brNum(total);
+  if (failed!=null) document.getElementById("bFail").textContent = brNum(failed);
+  // updated_at
+  try{
+    const d = updated_at ? new Date(updated_at) : null;
+    document.getElementById("kpiUpd").textContent = d
+      ? d.toLocaleString('pt-BR')
+      : "—";
+  }catch(e){ document.getElementById("kpiUpd").textContent = "—"; }
 }
 
 async function fetchData(){
   try{
-    const res  = await fetch(`${DATA_URL}?ts=${Date.now()}`, { cache: "no-store" });
+    const res = await fetch(`${DATA_URL}?ts=${Date.now()}`, {cache:"no-store"});
     const json = await res.json();
-    render(json.done, json.total, json.updated_at);
-  }catch(e){
-    console.error(e);
-    render(0, FALLBACK_TOTAL, null);
+    render(json);
+  }catch(err){
+    console.error(err);
+    render({});
   }
 }
 
+// primeira carga + refresh a cada 60s
 fetchData();
-setInterval(fetchData, 60000); // atualiza a cada 60s
+setInterval(fetchData, 60000);
 </script>
 </body>
 </html>
