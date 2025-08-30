@@ -81,7 +81,25 @@
 
   .foot{ display:flex; gap:10px; flex-wrap:wrap; color:var(--muted); font-size:.92rem }
   .pill{ border:1px solid var(--border); padding:6px 10px; border-radius:999px; background:#0b1220 }
-</style>
+/* Correções para celular */
+@media (max-width: 540px){
+  .header{
+    flex-direction: column;          /* empilha título e chips */
+    align-items: stretch;
+    gap: 12px;
+  }
+  .badgeRow{
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;                 /* permite quebrar linha */
+    justify-content: flex-start;     /* alinha à esquerda */
+    gap: 8px 10px;                   /* espaçamento entre chips */
+  }
+  .chip{
+    padding: 6px 10px;
+    font-size: .9rem;                /* levemente menor p/ caber */
+  }
+}</style>
 </head>
 <body>
   <div class="wrap">
