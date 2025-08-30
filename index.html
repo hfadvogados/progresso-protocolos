@@ -3,187 +3,177 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Progresso de Protocolos • Copacabana</title>
+<title>Progresso de Protocolos</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --green:#16a34a;     /* verde “esperança” */
-    --dark:#111827;      /* cinza-escuro para texto */
-    --muted:#6b7280;     /* cinza de apoio */
-    --card:#ffffff;
-    --bg:#f8fafc;        /* areia clara */
-    --accent:#0ea5e9;    /* azul “mar” */
+    --bg: #0f172a;
+    --panel: #111827cc;
+    --muted: #9aa3b2;
+    --text: #e5e7eb;
+    --ring: #22c55e;
+    --track:#1f2937;
+    --accent:#38bdf8;
+    --danger:#ef4444;
+    --border:#2a3648;
+    --shadow: 0 10px 30px rgba(0,0,0,.35);
   }
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
-    margin:0;
-    font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,sans-serif;
-    color:var(--dark);
+    margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,sans-serif;
+    color:var(--text);
     background:
-      radial-gradient(1200px 600px at 50% -10%, rgba(255,193,7,.10), transparent 70%),
+      radial-gradient(1200px 800px at 20% -10%, #1f2937 0%, transparent 60%),
+      radial-gradient(1400px 1000px at 120% 120%, #1f2937 0%, transparent 60%),
       var(--bg);
     display:flex; align-items:center; justify-content:center; padding:24px;
   }
-
-  /* Padrão Copacabana (ondas P&B) bem suave no fundo */
-  .copacabana{
-    position:fixed; inset:0; pointer-events:none; opacity:.07;
-    background:
-      repeating-linear-gradient(90deg, #000 0 16px, #fff 16px 32px),
-      repeating-radial-gradient(circle at 0 16px, transparent 0 14px, rgba(0,0,0,.08) 14px 16px);
-    mix-blend-mode:multiply;
-  }
-
-  .wrap{
-    position:relative; z-index:1;
-    width:min(860px,100%); display:grid; gap:20px;
-    grid-template-columns: 1fr;
-  }
-
+  .wrap{ width:min(980px,100%); display:grid; gap:20px; }
   .card{
-    background:var(--card);
-    border-radius:16px;
-    box-shadow:0 10px 25px rgba(0,0,0,.08);
-    padding:24px;
+    background:var(--panel); border:1px solid var(--border);
+    border-radius:16px; padding:20px 22px; box-shadow:var(--shadow); backdrop-filter: blur(8px);
   }
-
-  /* Header */
-  .header{display:flex; gap:16px; align-items:center; justify-content:space-between; flex-wrap:wrap}
-  .title{font-weight:700; font-size:1.1rem;}
-  .badges{display:flex; gap:10px; flex-wrap:wrap}
+  .header{ display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap }
+  .title{ font-weight:700; letter-spacing:.2px }
+  .badgeRow{ display:flex; gap:10px; flex-wrap:wrap }
   .chip{
-    background:#f1f5f9; color:#0f172a; border-radius:999px; padding:8px 12px; font-size:.92rem;
-    display:flex; align-items:center; gap:8px; border:1px solid #e2e8f0;
+    display:flex; gap:8px; align-items:center; padding:8px 12px; border-radius:999px;
+    background:#0b1220; border:1px solid var(--border); color: var(--muted);
   }
-  .chip .dot{width:8px;height:8px;border-radius:50%}
-  .chip.ok   .dot{background:var(--green)}
-  .chip.fail .dot{background:#ef4444}
-  .chip.meta .dot{background:var(--accent)}
+  .chip strong{ color:var(--text) }
+  .dot{ width:8px; height:8px; border-radius:50% }
+  .ok .dot{ background:var(--ring) }
+  .fail .dot{ background:var(--danger) }
+  .meta .dot{ background:var(--accent) }
 
-  /* Gauge */
+  .main{ display:grid; grid-template-columns: 360px 1fr; gap:20px; align-items:center }
+  @media (max-width: 880px){ .main{ grid-template-columns:1fr } }
+
   .gauge{
-    display:grid; grid-template-columns: 320px 1fr; gap:24px; align-items:center;
-  }
-  @media (max-width:780px){ .gauge{grid-template-columns:1fr; text-align:center} }
-
-  .ring{
-    --angle:0deg;
-    width:280px; height:280px; border-radius:50%;
+    --angle: 0deg;
+    width:320px; height:320px; border-radius:50%;
     background:
-      conic-gradient(var(--green) var(--angle), #e5e7eb var(--angle));
-    display:flex; align-items:center; justify-content:center;
-    position:relative;
-    transition: background 900ms cubic-bezier(.2,.8,.2,1);
+      conic-gradient(var(--ring) var(--angle), var(--track) var(--angle));
+    display:flex; align-items:center; justify-content:center; position:relative;
+    box-shadow: var(--shadow);
+    transition: background 800ms cubic-bezier(.2,.8,.2,1);
   }
-  .ring::before{
-    content:""; position:absolute; width:210px; height:210px; border-radius:50%;
-    background:#fff; box-shadow:inset 0 0 0 1px #eef2f7;
+  .gauge::before{
+    content:""; position:absolute; width:240px; height:240px; border-radius:50%;
+    background:#0b1220; border:1px solid var(--border); box-shadow: inset 0 0 0 1px #0f172a;
   }
-  .center{position:absolute; text-align:center}
-  .pct{font-size:2.4rem; font-weight:700;}
-  .cnt{margin-top:.25rem; color:var(--muted)}
+  .center{ position:absolute; text-align:center }
+  .pct{ font-size:2.8rem; font-weight:700 }
+  .cnt{ margin-top:.25rem; color:var(--muted) }
 
-  .meta{ display:grid; gap:10px; }
+  .right{ display:grid; gap:12px }
   .kpi{
-    padding:14px 16px; border:1px solid #e2e8f0; border-radius:12px; background:#fff;
     display:flex; align-items:center; justify-content:space-between;
+    background:#0b1220; border:1px solid var(--border); border-radius:12px; padding:14px 16px;
   }
-  .kpi span:first-child{color:#334155}
-  .kpi strong{font-weight:700}
+  .kpi span{ color:var(--muted) }
+  .kpi strong{ font-size:1.05rem }
 
-  .foot{margin-top:10px; color:var(--muted); font-size:.92rem; display:flex; gap:10px; align-items:center; flex-wrap:wrap}
-  .pill{
-    border:1px solid #e2e8f0; padding:6px 10px; border-radius:999px; background:#fff; color:#334155;
-  }
+  .linear{ height:10px; border-radius:999px; background:#0b1220; border:1px solid var(--border); overflow:hidden }
+  .fill{ height:100%; width:0%; background: linear-gradient(90deg, var(--ring), #4ade80 60%, var(--ring)); transition: width 800ms }
 
-  /* “Sol” sutil */
-  .sun{
-    position:absolute; top:-24px; left: -24px;
-    width:96px; height:96px; border-radius:50%;
-    background:radial-gradient(circle at 30% 30%, #fde68a, #f59e0b 60%, transparent 70%);
-    filter:blur(2px); opacity:.9; pointer-events:none;
-  }
+  .foot{ display:flex; gap:10px; flex-wrap:wrap; color:var(--muted); font-size:.92rem }
+  .pill{ border:1px solid var(--border); padding:6px 10px; border-radius:999px; background:#0b1220 }
 </style>
 </head>
 <body>
-<div class="copacabana"></div>
-
-<div class="wrap">
-  <div class="card header">
-    <div class="title">Progresso de Protocolos • Rio</div>
-    <div class="badges">
-      <div class="chip ok"><span class="dot"></span><span>Concluídos:</span><strong id="bDone">0</strong></div>
-      <div class="chip fail"><span class="dot"></span><span>Falhados:</span><strong id="bFail">0</strong></div>
-      <div class="chip meta"><span class="dot"></span><span>Meta:</span><strong id="bTotal">2 589</strong></div>
-    </div>
-  </div>
-
-  <div class="card gauge">
-    <div class="ring" id="ring"><div class="sun"></div>
-      <div class="center">
-        <div class="pct" id="pct">0,0%</div>
-        <div class="cnt" id="cnt">0 de 0</div>
+  <div class="wrap">
+    <div class="card header" role="banner">
+      <div class="title">Progresso de Protocolos</div>
+      <div class="badgeRow">
+        <div class="chip ok"   aria-label="Concluídos"><span class="dot"></span><span>Concluídos:</span><strong id="bDone">0</strong></div>
+        <div class="chip fail" aria-label="Falhados"><span class="dot"></span><span>Falhados:</span><strong id="bFail">0</strong></div>
+        <div class="chip meta" aria-label="Meta"><span class="dot"></span><span>Meta:</span><strong id="bTotal">2 589</strong></div>
       </div>
     </div>
-    <div class="meta">
-      <div class="kpi"><span>Percentual concluído</span><strong id="kpiPct">0,0%</strong></div>
-      <div class="kpi"><span>Restantes</span><strong id="kpiLeft">0</strong></div>
-      <div class="kpi"><span>Última atualização</span><strong id="kpiUpd">—</strong></div>
+
+    <div class="card main">
+      <div class="gauge" id="gauge" aria-label="Progresso total">
+        <div class="center" aria-live="polite">
+          <div class="pct" id="pct">0,0%</div>
+          <div class="cnt" id="cnt">0 de 0</div>
+        </div>
+      </div>
+
+      <div class="right">
+        <div class="kpi"><span>Percentual concluído</span><strong id="kpiPct">0,0%</strong></div>
+        <div class="kpi"><span>Restantes</span><strong id="kpiLeft">0</strong></div>
+        <div class="kpi"><span>Última atualização</span><strong id="kpiUpd">—</strong></div>
+        <div class="linear" aria-hidden="true"><div class="fill" id="fill"></div></div>
+      </div>
+    </div>
+
+    <div class="foot">
+      <span class="pill">Atualiza automaticamente a cada 60s</span>
+      <span>Fonte de dados: <code>status.json</code></span>
     </div>
   </div>
 
-  <div class="foot">
-    <span class="pill">Calçadão de Copacabana • estilo visual</span>
-    <span>Atualiza automaticamente a cada 60s</span>
-  </div>
-</div>
-
 <script>
-const FALLBACK_TOTAL = 2589;           // se o JSON não trouxer total
-const DATA_URL = "status.json";        // mesmo repositório
+  const FALLBACK_TOTAL = 2589;
+  const DATA_URL = "status.json";
 
-function brNum(n){ return Number(n||0).toLocaleString('pt-BR'); }
-function pctText(p){ return (p*100).toFixed(1).replace('.',',') + "%"; }
+  const el = {
+    gauge: document.getElementById("gauge"),
+    pct:   document.getElementById("pct"),
+    cnt:   document.getElementById("cnt"),
+    bDone: document.getElementById("bDone"),
+    bFail: document.getElementById("bFail"),
+    bTotal:document.getElementById("bTotal"),
+    kpiPct:document.getElementById("kpiPct"),
+    kpiLeft:document.getElementById("kpiLeft"),
+    kpiUpd:document.getElementById("kpiUpd"),
+    fill:  document.getElementById("fill"),
+  };
 
-function render({done=0,total=FALLBACK_TOTAL,failed=null,updated_at=null}){
-  total = Number(total)||FALLBACK_TOTAL; done = Number(done)||0;
-  const pct = Math.max(0, Math.min(1, done/total));
-  const left = Math.max(0, total - done);
-  // ring
-  document.getElementById("ring").style.setProperty("--angle", (pct*360)+"deg");
-  document.getElementById("pct").textContent = pctText(pct);
-  document.getElementById("cnt").textContent = `${brNum(done)} de ${brNum(total)}`;
-  // KPIs
-  document.getElementById("kpiPct").textContent  = pctText(pct);
-  document.getElementById("kpiLeft").textContent = brNum(left);
-  document.getElementById("bDone").textContent   = brNum(done);
-  document.getElementById("bTotal").textContent  = brNum(total);
-  if (failed!=null) document.getElementById("bFail").textContent = brNum(failed);
-  // updated_at
-  try{
-    const d = updated_at ? new Date(updated_at) : null;
-    document.getElementById("kpiUpd").textContent = d
-      ? d.toLocaleString('pt-BR')
-      : "—";
-  }catch(e){ document.getElementById("kpiUpd").textContent = "—"; }
-}
+  function br(n){ return Number(n||0).toLocaleString('pt-BR'); }
+  function pctText(p){ return (p*100).toFixed(1).replace('.',',') + "%"; }
 
-async function fetchData(){
-  try{
-    const res = await fetch(`${DATA_URL}?ts=${Date.now()}`, {cache:"no-store"});
-    const json = await res.json();
-    render(json);
-  }catch(err){
-    console.error(err);
-    render({});
+  function render({done=0,total=FALLBACK_TOTAL,failed=null,updated_at=null}){
+    total = Number(total)||FALLBACK_TOTAL;
+    done  = Number(done)||0;
+    const pct = Math.max(0, Math.min(1, done/total));
+    const left = Math.max(0, total - done);
+
+    el.gauge.style.setProperty("--angle", (pct*360) + "deg");
+    el.pct.textContent   = pctText(pct);
+    el.cnt.textContent   = `${br(done)} de ${br(total)}`;
+    el.kpiPct.textContent= pctText(pct);
+    el.kpiLeft.textContent = br(left);
+    el.bDone.textContent = br(done);
+    el.bTotal.textContent= br(total);
+    if (failed!=null) el.bFail.textContent = br(failed);
+
+    el.fill.style.width = (pct*100) + "%";
+
+    try{
+      const d = updated_at ? new Date(updated_at) : null;
+      el.kpiUpd.textContent = d ? d.toLocaleString('pt-BR') : "—";
+    }catch{
+      el.kpiUpd.textContent = "—";
+    }
   }
-}
 
-// primeira carga + refresh a cada 60s
-fetchData();
-setInterval(fetchData, 60000);
+  async function fetchData(){
+    try{
+      const res = await fetch(`${DATA_URL}?ts=${Date.now()}`, {cache:"no-store"});
+      const json = await res.json();
+      render(json);
+    }catch(e){
+      console.error(e);
+      render({});
+    }
+  }
+
+  fetchData();
+  setInterval(fetchData, 60000);
 </script>
 </body>
 </html>
