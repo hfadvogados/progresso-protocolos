@@ -2,5 +2,5 @@
   "done": 822,
   "total": 2589,
   "failed": 37,
-  "updated_at": "2025-08-29T00:36:00-03:00"
+  "updated_at": = new Date().toISOString()
 }
