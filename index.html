@@ -69,7 +69,7 @@
   .muted{ color:var(--muted) }
   .warn{ color:#fca5a5 }
 
-  /* chips adicionais para mobile */
+  /* chips extra para mobile */
   .miniBadges{ display:none; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
   .miniBadges .chip{ padding:6px 10px; font-size:.95rem }
 
@@ -119,7 +119,7 @@
     </div>
 
     <div class="foot">
-      <span class="pill">Hugo Filardi Advogados</span>
+      <span class="pill">Atualiza automaticamente a cada 60s</span>
       <span>Fonte de dados: <code>status.json</code></span>
       <span id="footCache" class="muted"></span>
     </div>
@@ -165,8 +165,9 @@
     if(bt2) bt2.textContent=br(total);
     if(bf2 && failed!=null) bf2.textContent=br(failed);
 
-    try{ const d=updated_at?new Date(updated_at):new Date();
-      el.kpiUpd.textContent=d.toLocaleString('pt-BR');
+    try{
+      const d = updated_at ? new Date(updated_at) : new Date();
+      el.kpiUpd.textContent = d.toLocaleString('pt-BR');
     }catch{ el.kpiUpd.textContent="—"; }
   }
 
@@ -175,11 +176,14 @@
   }
 
   function saveLastOk(payload){
-    try{ localStorage.setItem(LS_KEY,JSON.stringify({payload,ts:Date.now()}));
-      el.footCache.textContent=""; }catch{}
+    try{
+      localStorage.setItem(LS_KEY,JSON.stringify({payload,ts:Date.now()}));
+      el.footCache.textContent="";
+    }catch{}
   }
   function loadLastOk(){
-    try{ const raw=localStorage.getItem(LS_KEY); if(!raw) return null;
+    try{
+      const raw=localStorage.getItem(LS_KEY); if(!raw) return null;
       const {payload,ts}=JSON.parse(raw); if(!payload) return null;
       el.footCache.textContent=`Último sucesso salvo: ${new Date(ts).toLocaleString('pt-BR')}`;
       return payload;
@@ -198,19 +202,6 @@
       const res=await fetchWithTimeout(`${DATA_URL}?ts=${Date.now()}`,{cache:"no-store"});
       if(!res.ok) throw new Error(`HTTP ${res.status}`);
       const json=await res.json();
-      if(json && (json.done==null||json.total==null)){ json.total??=FALLBACK_TOTAL; json.done??=0; }
-      if(!json.updated_at) json.updated_at=new Date().toISOString();
-      render(json); saveLastOk(json); setStatus("atualizado");
-    }catch(err){
-      console.error(err); const cached=loadLastOk();
-      if(cached){ render(cached); setStatus("sem conexão — mostrando último dado salvo",true); }
-      else{ render({}); setStatus("erro ao atualizar",true); }
-    }
-  }
 
-  el.btnRefresh.addEventListener("click",loadData);
-  const cached=loadLastOk(); if(cached){ render(cached); setStatus("carregado do cache"); }
-  loadData(); setInterval(loadData,POLL_MS);
-</script>
-</body>
-</html>
+      // sane defaults
+      if(json && (json.done==null||json.total==null)){ json.total
