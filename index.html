@@ -199,7 +199,7 @@
       if(!res.ok) throw new Error(`HTTP ${res.status}`);
       const json=await res.json();
       if(json && (json.done==null||json.total==null)){ json.total??=FALLBACK_TOTAL; json.done??=0; }
-      if(!json.updated_at) json.updated_at=new Date().toISOString();
+      json.updated_at = new Date().toISOString();
       render(json); saveLastOk(json); setStatus("atualizado");
     }catch(err){
       console.error(err); const cached=loadLastOk();
